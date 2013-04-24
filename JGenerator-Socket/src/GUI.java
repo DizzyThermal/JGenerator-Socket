@@ -25,8 +25,8 @@ public class GUI extends JFrame implements ActionListener
 	
 	// Panel Objects
 	private static final int ADDRESS	= 1;
-	private static final int RATE		= 5;
-	private static final int DURATION	= 7;
+	private static final int RATE		= 3;
+	private static final int DURATION	= 5;
 
 	private String[] panelOptions = { "Address", "Rate", "Duration" };
 

@@ -55,7 +55,7 @@ public class JGenerator
 		GUI go = new GUI();
 
 		go.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		go.setSize(440, 195);
+		go.setSize(440, 155);
 		go.setResizable(false);
 		go.setVisible(true);
 	}
