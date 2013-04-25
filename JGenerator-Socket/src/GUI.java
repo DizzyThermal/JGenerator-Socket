@@ -25,10 +25,11 @@ public class GUI extends JFrame implements ActionListener
 	
 	// Panel Objects
 	private static final int ADDRESS	= 1;
-	private static final int RATE		= 3;
+	private static final int TYPE		= 3;
 	private static final int DURATION	= 5;
 
-	private String[] panelOptions = { "Address", "Rate", "Duration" };
+	private String[] panelOptions = { "Address", "Connection Type", "Duration" };
+	private String[] connectionStrings = { "TCP", "UDP" };
 
 	private String ipErrorString =	"IP Format:\n" + 
 									"xxx.xxx.xxx.xxx\n" +
@@ -60,7 +61,7 @@ public class GUI extends JFrame implements ActionListener
 		mainPanel.add(new JLabel(panelOptions[0] + ":"));
 		mainPanel.add(new JTextField());
 		mainPanel.add(new JLabel(panelOptions[1] + ":"));
-		mainPanel.add(new JSpinner(new SpinnerNumberModel(1, 1, 1000000, 1)));
+		mainPanel.add(new JComboBox(connectionStrings));
 		mainPanel.add(new JLabel(panelOptions[2] + ":"));
 		mainPanel.add(new JSpinner(new SpinnerNumberModel(10, 1, 1000000, 1)));
 		
@@ -80,15 +81,13 @@ public class GUI extends JFrame implements ActionListener
 	{
 		if(e.getSource() == generateTrafficButton)
 		{
-			playFire();
-			
 			Object[] parameters = new Object[4];
 			parameters[0] = ((JTextField)mainPanel.getComponent(ADDRESS)).getText();
 			if(!validIP((String)parameters[0]))
 				JOptionPane.showMessageDialog(this, ipErrorString);
 			else
 			{
-				parameters[1] = Integer.parseInt(((JSpinner)mainPanel.getComponent(RATE)).getValue().toString());
+				parameters[1] = (String)((JComboBox)mainPanel.getComponent(TYPE)).getSelectedItem();
 				parameters[2] = Integer.parseInt(((JSpinner)mainPanel.getComponent(DURATION)).getValue().toString());
 
 				try { JGenerator.GUIExecute(parameters); }
@@ -101,9 +100,9 @@ public class GUI extends JFrame implements ActionListener
 	
 	public void defaultFields()
 	{
-		((JTextField)mainPanel.getComponent(ADDRESS)).setText("192.168.1.100:8080");
-		((JSpinner)mainPanel.getComponent(RATE)).setValue(1);
-		((JSpinner)mainPanel.getComponent(DURATION)).setValue(30);
+		((JTextField)mainPanel.getComponent(ADDRESS)).setText(Resource.IP + ":" + Resource.PORT);
+		((JComboBox)mainPanel.getComponent(TYPE)).setSelectedIndex(0);
+		((JSpinner)mainPanel.getComponent(DURATION)).setValue(Resource.DURATION);
 	}
 	
 	public boolean validIP(String ip)
@@ -141,19 +140,5 @@ public class GUI extends JFrame implements ActionListener
 	        return true;
 	    }
 		catch (NumberFormatException nfe) { return false; }
-	}
-	
-	public void playFire()
-	{
-		try
-	    {
-	        Clip clip = AudioSystem.getClip();
-	        clip.open(AudioSystem.getAudioInputStream(new File("a6-fire.wav").getAbsoluteFile()));
-	        clip.start();
-	    }
-	    catch (Exception exc)
-	    {
-	        exc.printStackTrace(System.out);
-	    }
 	}
 }

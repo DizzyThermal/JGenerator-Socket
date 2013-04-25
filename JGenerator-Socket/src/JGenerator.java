@@ -2,26 +2,20 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.HttpURLConnection;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.Socket;
-import java.net.URL;
-import java.text.DecimalFormat;
 
 import javax.swing.JFrame;
 
 public class JGenerator 
 {
-	private static String IP				= "http://192.168.1.100";
-	private static String PORT				= "8080";
-	private static String URL				= IP + ":" + PORT;
-
-	private static int DURATION				= 30;
-
-	private static int rate;
+	public static DatagramSocket clientSocketUDP;
+	public static DatagramPacket sendPacket;
+	public static byte[] sendData = new byte[1024];
 	
-	private static boolean GUI = false;
-	
-	public static Socket clientSocket;
+	public static Socket clientSocketTCP;
 	public static PrintWriter pWriter;
 	
 	public static void main(String[] args) throws IOException 
@@ -31,21 +25,33 @@ public class JGenerator
 		
 	public static void generateTraffic()
 	{
-		URL = IP + ":" + PORT;
-		
 		double totalTime = 0;
 		try
 		{
-			clientSocket = new Socket(Resource.IP, Integer.parseInt(Resource.PORT));
-			pWriter = new PrintWriter(clientSocket.getOutputStream(), true);
-			
-			while(totalTime/1000 < DURATION)
+			if(Resource.TYPE.equals("UDP"))
 			{
-				pWriter.println("TRAFFIC!!!!");
-				totalTime++;
+				clientSocketUDP = new DatagramSocket(Integer.parseInt(Resource.PORT));
+				while(totalTime/1000 < Resource.DURATION)
+				{
+					sendData = "NOISE: AHGFHADFYGTN#^RGFNQIYAHUNYGRCBNUGXYNRFJFGXH JYFGDK UFYXDFXUNGDSKFUXNGSKYUFGXASNDFXHASNGXADSKNFXGADNFXHGADNFXJADGFXBAJDFXNGBDANFXAKSBYGXNJHGBADXBFNAFJHAKFJXNHAKUFXHNAKYUGFXNAYUGUFX".getBytes();
+					sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName(Resource.IP), Integer.parseInt(Resource.PORT));
+					clientSocketUDP.send(sendPacket);
+					totalTime++;
+				}
+				
+				clientSocketUDP.close();
 			}
-			
-			pWriter.close();
+			else
+			{
+				while(totalTime/1000 < Resource.DURATION)
+				{
+					clientSocketTCP = new Socket(Resource.IP, Integer.parseInt(Resource.PORT));
+					pWriter = new PrintWriter(clientSocketTCP.getOutputStream(), true);
+					
+					pWriter.println("NOISE: AHGFHADFYGTN#^RGFNQIYAHUNYGRCBNUGXYNRFJFGXH JYFGDK UFYXDFXUNGDSKFUXNGSKYUFGXASNDFXHASNGXADSKNFXGADNFXHGADNFXJADGFXBAJDFXNGBDANFXAKSBYGXNJHGBADXBFNAFJHAKFJXNHAKUFXHNAKYUGFXNAYUGUFX");
+					totalTime++;
+				}
+			}
 		}
 		catch (Exception e) { e.printStackTrace(); }
 	}
@@ -55,24 +61,23 @@ public class JGenerator
 		GUI go = new GUI();
 
 		go.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		go.setSize(440, 155);
+		go.setSize(440, 185);
 		go.setResizable(false);
 		go.setVisible(true);
 	}
 	
 	public static void GUIExecute(Object[] parameters) throws IOException
 	{
-		GUI			= true;
 		if(((String)parameters[0]).contains(":"))
 		{
-			IP		= "http://" + ((String)parameters[0]).split(":")[0];
-			PORT	= ((String)parameters[0]).split(":")[1];
+			Resource.IP	= "http://" + ((String)parameters[0]).split(":")[0];
+			Resource.PORT	= ((String)parameters[0]).split(":")[1];
 		}
 		else
-			IP = "http://" + (String)parameters[0];
+			Resource.IP = "http://" + (String)parameters[0];
 		
-		rate		= (int)parameters[1];
-		DURATION	= (int)parameters[2];
+		Resource.TYPE = (String)parameters[1];
+		Resource.DURATION	= (int)parameters[2];
 		
 		generateTraffic();
 	}
